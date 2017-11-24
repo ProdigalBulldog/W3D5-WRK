@@ -5,7 +5,15 @@ require 'active_support/inflector'
 
 class SQLObject
   def self.columns
-    # ...
+    sql = "
+      SELECT
+        *
+      FROM
+        #{self.table_name}
+    "
+    
+    @col_sym_array ||
+      @col_sym_array = DBConnection.execute2(sql).first.map! { |col_name_str| col_name_str.to_sym }
   end
 
   def self.finalize!
@@ -16,7 +24,9 @@ class SQLObject
   end
 
   def self.table_name
-    @table_name
+    # @table_name = self.name.tableize if @table_name.nil?
+    # @table_name
+    @table_name || @table_name = self.name.tableize
   end
 
   def self.all
